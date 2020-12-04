@@ -9,18 +9,21 @@ import sklearn_crfsuite
 from sklearn_crfsuite import scorers
 from sklearn_crfsuite import metrics
 from sklearn_crfsuite.metrics import flat_classification_report
+from sklearn.externals import joblib
 
-data_path = 'C:/Users/USER/Desktop/AICup_test1/data/sample.data'
-raw_data_path = 'C:/Users/USER/Desktop/AICup_test1/data/train_2.txt' #train_2.txt
-raw_test_data_path = 'C:/Users/USER/Desktop/AICup_test1/test_data/test2_fmt.txt'
-test_data_path = 'C:/Users/USER/Desktop/AICup_test1/test_data/test.data'
-vector_path = 'C:/Users/USER/Desktop/AICup_test1/trained_vector/fasttext.vec'#fasttext.vec'
+data_path = './data/sample.data'
+raw_data_path = './data/train_2.txt' #train_2.txt
+raw_test_data_path = './test_data/test2_fmt.txt'
+test_data_path = './test_data/test.data'
+vector_path = './trained_vector/cna.cbow.cwe_p.tar_g.512d.0.txt'#fasttext.vec'
+output_path = 'output.tsv'
+model_path = './models/crf.model'
 
 def loadInputFile(path):
     trainingset = list()  # store trainingset [content,content,...]
     position = list()  # store position [article_id, start_pos, end_pos, entity_text, entity_type, ...]
     mentions = dict()  # store mentions[mention] = Type
-    with open(raw_data_path, 'r', encoding='utf8') as f:
+    with open(path, 'r', encoding='utf8') as f:
         file_text=f.read().encode('utf-8').decode('utf-8-sig')
     datas=file_text.split('\n\n--------------------\n\n')[:-1]
     for data in datas:
@@ -163,15 +166,19 @@ def CRFFormatData(trainingset, position, path):
     outputfile.close()
 
 def CRF(x_train, y_train, x_test, y_test):
-    crf = sklearn_crfsuite.CRF(
-        algorithm='lbfgs',
-        c1=0.1,
-        c2=0.1,
-        max_iterations=100,
-        all_possible_transitions=True
-    )
-    crf.fit(x_train, y_train)
-    
+    # crf = sklearn_crfsuite.CRF(
+    #     algorithm='lbfgs',
+    #     c1=0.1,
+    #     c2=0.1,
+    #     max_iterations=100,
+    #     all_possible_transitions=True
+    # )
+    # crf.fit(x_train, y_train)
+
+    # # Save trained model
+    # joblib.dump(crf, model_path)
+    crf = joblib.load(model_path)
+
     y_pred = crf.predict(x_test)
     y_pred_mar = crf.predict_marginals(x_test)
     # print(crf)
@@ -219,7 +226,6 @@ def Dataset(data_path):
     #                                                                                                 test_size=0.33,
     #                                                                                                 random_state=42)
     return data_list, article_id_list #, traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list 
-
 
 # return a list of word vectors corresponding to each token in train.data
 def Word2Vector(data_list, embedding_dict):
@@ -272,7 +278,7 @@ if __name__ == "__main__":
     testingset, position_test, mentions_test=loadInputFile(raw_test_data_path)
     CRFFormatData(trainingset, position, data_path)
     CRFFormatData(testingset, position_test, test_data_path)
-    
+    input('...')
     # Process word vector
     dim = 0
     word_vecs= {}
@@ -293,8 +299,6 @@ if __name__ == "__main__":
     #data_list, traindata_list, testdata_list, traindata_article_id_list, testdata_article_id_list = Dataset(data_path)
     traindata_list, traindata_article_id_list = Dataset(data_path)
     testdata_list, testdata_article_id_list = Dataset(test_data_path)
-    # print(data_list) #  ('謝', 'O'), ('謝', 'O'), ('。', 'O')]] 
-    # input('...')
     # print(traindata_list) #  ('謝', 'O'), ('謝', 'O'), ('。', 'O')]] 
     # input('...')
     # print(testdata_list) #  ('謝', 'O'), ('謝', 'O'), ('。', 'O')]] 
@@ -314,8 +318,10 @@ if __name__ == "__main__":
     x_test = Feature(testembed_list)
     y_test = Preprocess(testdata_list)
     
+    print('Training model...')
     y_pred, y_pred_mar, f1score = CRF(x_train, y_train, x_test, y_test)
-    print('F1 Score: ' + str(f1score))
+    # print('F1 Score: ' + str(f1score))
+    print(y_pred)
 
     output="article_id\tstart_position\tend_position\tentity_text\tentity_type\n"
     for test_id in range(len(y_pred)):
@@ -335,7 +341,7 @@ if __name__ == "__main__":
                 output+=line+'\n'
             pos+=1
 
-    output_path='output.tsv'
+    
     with open(output_path,'w',encoding='utf-8') as f:
         f.write(output)
     print(output)
