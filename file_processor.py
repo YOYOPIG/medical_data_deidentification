@@ -14,16 +14,19 @@ class FileProcessor():
         word_vecs= {}
         with open(vector_path,encoding="utf-8") as f: # cna.cbow.cwe_p.tar_g.512d.0.txt',encoding="utf-8") as f:
             for line in f:
-                tokens = line.strip().split()
+                try:
+                    tokens = line.strip().split()
 
-                # there 2 integers in the first line: vocabulary_size, word_vector_dim
-                if len(tokens) == 2:
-                    dim = int(tokens[1])
-                    continue
-            
-                word = tokens[0] 
-                vec = np.array([ float(t) for t in tokens[1:] ])
-                word_vecs[word] = vec
+                    # there 2 integers in the first line: vocabulary_size, word_vector_dim
+                    if len(tokens) == 2:
+                        dim = int(tokens[1])
+                        continue
+                
+                    word = tokens[0] 
+                    vec = np.array([ float(t) for t in tokens[1:] ])
+                    word_vecs[word] = vec
+                except:
+                    pass
         print('vocabulary_size: ',len(word_vecs),' word_vector_dim: ',vec.shape)
         return word_vecs
 
