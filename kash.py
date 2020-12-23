@@ -1,11 +1,25 @@
-# from kashgari.corpus import ChineseDailyNerCorpus
+from kashgari.corpus import ChineseDailyNerCorpus
 from kashgari.tasks.labeling import BiLSTM_Model
 from tensorflow.python.keras.callbacks import ModelCheckpoint
 import pickle
 from tensorflow.python.client import device_lib
 import kashgari
 from kashgari.utils import load_model
+
+# from kashgari.embeddings import BertEmbedding
+from kashgari.tasks.labeling import BiGRU_Model
+from kashgari.embeddings import bert_embedding
+from kashgari.tasks.labeling import BiLSTM_CRF_Model
 kashgari.config.use_cudnn_cell = True
+
+def bad_handler(x, y):
+    ret = y
+    ctr = len(ret)
+    while ctr<len(x):
+        ret.append('O')
+        ctr+=1
+    return ret
+
 
 # train_x, train_y = ChineseDailyNerCorpus.load_data('train')
 # test_x, test_y = ChineseDailyNerCorpus.load_data('test')
@@ -21,23 +35,44 @@ with open("./test_data/bert_y.data", "rb") as fp:   # Unpickling
 # print(train_x)
 # print(train_y)
 
+############ Train########################
 filepath = "./checkpoints/saved-model-{epoch:02d}-{acc:.2f}.hdf5"
 checkpoint_callback = ModelCheckpoint(filepath,
                                       monitor = 'acc',
                                       verbose = 1)
 
-model = BiLSTM_Model()
-print('Training...')
-model.fit(train_x, train_y, epochs=2, callbacks=[checkpoint_callback])
+my_embedding = kashgari.embeddings.BERTEmbedding('./trained_vector/chinese_L-12_H-768_A-12', task=kashgari.LABELING)
+model = BiLSTM_CRF_Model(my_embedding)
+
+# print(train_x)
+# print(train_y)
+
+model.fit(train_x, train_y)
+
+# model = BiLSTM_Model()
+# print('Training...')
+# model.fit(train_x, train_y, epochs=2, callbacks=[checkpoint_callback])
 # model.fit(train_x, train_y, valid_x, valid_y, epochs=50)
 model.save('./models/full_model')
-
+############ Train########################
 
 # model = load_model('./models/full_model')
 
 # model.tf_model.load_weights('./checkpoints/saved-model-01-0.96.hdf5')
 pred = model.predict(test_x)
-print(pred)
+print(len(pred))
+print(len(test_x))
+for i in range(len(test_x)):
+    if len(pred[i]) != len(test_x[i]):
+        pred[i] = bad_handler(test_x[i], pred[i])
+        # print('at conversation #' + str(i))
+        # print(pred[i])
+        # print(test_x[i])
+        # print(len(pred[i]))
+        # print(len(test_x[i]))
+        # inp = input()
+        # if inp=='pass':
+        #     break
 total=0
 for item in pred:
     total+=len(item)

@@ -1,4 +1,6 @@
 import pickle
+from output_generator import OutputGenerator
+from data_processor import DataProcessor
 
 def data4bert():
     f = open("./test_data/test.data", encoding='utf-8')
@@ -65,15 +67,16 @@ def handle_bert_output():
         prev = len(tmp)
         tmp.extend(item)
         if len(tmp)>=article_len[ctr]-1: #\n behind
-            print('match')
-            print(prev)
-            print(len(tmp))
-            print(article_len[ctr])
+            # print('match')
+            # print(prev)
+            # print(len(tmp))
+            # print(article_len[ctr])
             res.append(tmp)
             tmp=[]
             ctr+=1
-    # print(len(tmp))
-    # print(res)
+    print(len(tmp))
+    print(res)
+    return res
 
 def format_data():
     f = open("./test_data/final.txt", encoding='utf-8')
@@ -130,4 +133,10 @@ def check_words():
     print(total)
     print(total2)
     print(total3)
-check_words()
+
+test_data_path = './test_data/test_simp.data'
+pred = handle_bert_output()
+data_processor = DataProcessor()
+testdata_list, test_data_article_id_list = data_processor.generate_dataset(test_data_path)
+output = OutputGenerator()
+output.generate(pred, testdata_list, test_data_article_id_list, 'output.tsv')

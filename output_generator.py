@@ -21,10 +21,13 @@ class OutputGenerator():
                         line=str(testdata_article_id_list[test_id])+'\t'+str(start_pos)+'\t'+str(end_pos+1)+'\t'+entity_text+'\t'+entity_type
                         output+=line+'\n'
                 except:
-                    end_pos=pos
-                    entity_text=''.join([testdata_list[test_id][position][0] for position in range(start_pos,end_pos+1)])
-                    line=str(testdata_article_id_list[test_id])+'\t'+str(start_pos)+'\t'+str(end_pos+1)+'\t'+entity_text+'\t'+entity_type
-                    output+=line+'\n'
+                    try:
+                        end_pos=pos
+                        entity_text='text'.join([testdata_list[test_id][position][0] for position in range(start_pos,end_pos+1)])
+                        line=str(testdata_article_id_list[test_id])+'\t'+str(start_pos)+'\t'+str(end_pos+1)+'\t'+entity_text+'\t'+entity_type
+                        output+=line+'\n'
+                    except:
+                        pass
                 pos+=1
         with open(output_path,'w',encoding='utf-8') as f:
             f.write(output)

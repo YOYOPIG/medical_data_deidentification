@@ -6,7 +6,7 @@ from model import Model
 data_path = './data/sample_simp.data'
 raw_data_path = './data/train_2.txt' #train_2.txt
 raw_test_data_path = './test_data/final_fmt_simp.txt'
-test_data_path = './test_data/test.data'
+test_data_path = './test_data/test_simp.data'
 vector_path = './trained_vector/Tencent_AILab_ChineseEmbedding.txt'#fasttext.vec'
 output_path = 'output.tsv'
 model_path = './models/crf.model'
