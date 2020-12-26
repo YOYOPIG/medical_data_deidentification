@@ -47,18 +47,17 @@ model = BiLSTM_CRF_Model(my_embedding)
 # print(train_x)
 # print(train_y)
 
-model.fit(train_x, train_y)
+model.fit(train_x, train_y, epochs=1)
 
 # model = BiLSTM_Model()
-# print('Training...')
 # model.fit(train_x, train_y, epochs=2, callbacks=[checkpoint_callback])
-# model.fit(train_x, train_y, valid_x, valid_y, epochs=50)
 model.save('./models/full_model')
 ############ Train########################
 
 # model = load_model('./models/full_model')
 
 # model.tf_model.load_weights('./checkpoints/saved-model-01-0.96.hdf5')
+# test_x = test_x[]
 pred = model.predict(test_x)
 print(len(pred))
 print(len(test_x))
@@ -73,13 +72,19 @@ for i in range(len(test_x)):
         # inp = input()
         # if inp=='pass':
         #     break
-total=0
-for item in pred:
-    total+=len(item)
-print(total)
-total=0
-for item in test_x:
-    total+=len(item)
-print(total)
+# total=0
+# for item in pred:
+#     total+=len(item)
+# print(total)
+# total=0
+# for item in test_x:
+#     total+=len(item)
+# print(total)
+# for x,y in test_x,pred:
+#     for i in range(len(y)):
+#         if y[i]!='O':
+#             print(x[i])
+
+    
 with open("./output/bert.arr", "wb") as fp:   #Pickling
     pickle.dump(pred, fp)

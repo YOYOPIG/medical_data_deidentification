@@ -74,8 +74,43 @@ def handle_bert_output():
             res.append(tmp)
             tmp=[]
             ctr+=1
-    print(len(tmp))
-    print(res)
+    print(len(res))
+    # print(res)
+    article_id=0
+    is_tar=False
+    start=0
+    end=0
+    ner_type=''
+    output = []
+    f = open("./test_data/final_fmt.txt", encoding='utf-8')
+    line = f.readline()
+    
+    for item in res:
+        if article_id>=0:
+            for i in range(len(item)):
+                if not is_tar:
+                    if item[i]=='O':
+                        continue
+                    else:
+                        is_tar=True
+                        start=i
+                        ner_type = item[i][2:]
+                else:
+                    if item[i]=='O':
+                        is_tar=False
+                        end = i-1
+                        output.append([article_id, start, end, ner_type, line[start:end]])
+                    else:
+                        continue
+        article_id += 1
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+        line = f.readline()
+    print(output)
+    f.close()
     return res
 
 def format_data():
@@ -134,9 +169,12 @@ def check_words():
     print(total2)
     print(total3)
 
+def gen_output():
+    test_data_path = './test_data/final_fmt.data'
+
 test_data_path = './test_data/test_simp.data'
 pred = handle_bert_output()
-data_processor = DataProcessor()
-testdata_list, test_data_article_id_list = data_processor.generate_dataset(test_data_path)
-output = OutputGenerator()
-output.generate(pred, testdata_list, test_data_article_id_list, 'output.tsv')
+# data_processor = DataProcessor()
+# testdata_list, test_data_article_id_list = data_processor.generate_dataset(test_data_path)
+# output = OutputGenerator()
+# output.generate(pred, testdata_list, test_data_article_id_list, 'output.tsv')

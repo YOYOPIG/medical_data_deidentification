@@ -59,6 +59,7 @@ class DataProcessor():
         embedding_list = list()
 
         # No Match Word (unknown word) Vector in Embedding
+        seed = rand()
         unk_vector=np.random.rand(*(list(embedding_dict.values())[0].shape))
 
         for idx_list in range(len(data_list)):
