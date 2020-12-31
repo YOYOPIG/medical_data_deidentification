@@ -179,6 +179,4 @@ def ez_bagging_sgns(file1_path, file2_path): # file1 has high priority, put the 
 ez_bagging_sgns('./to_merge/merged_ckip2.tsv', './to_merge/output.tsv')
 
 # rule base
-#普林	location
-#徘徊 name
-#芭乐	name
+# Clean med name, chemical name considered ppl name

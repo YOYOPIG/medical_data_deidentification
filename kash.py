@@ -32,9 +32,8 @@ with open("./test_data/bert_x.data", "rb") as fp:   # Unpickling
     test_x = pickle.load(fp)
 with open("./test_data/bert_y.data", "rb") as fp:   # Unpickling
     test_y = pickle.load(fp)
-# print(train_x)
-# print(train_y)
-
+print(test_x)
+input()
 ############ Train########################
 filepath = "./checkpoints/saved-model-{epoch:02d}-{acc:.2f}.hdf5"
 checkpoint_callback = ModelCheckpoint(filepath,
@@ -47,6 +46,9 @@ model = BiLSTM_CRF_Model(my_embedding)
 # print(train_x)
 # print(train_y)
 
+# print(len(test_x)) #16221
+
+
 model.fit(train_x, train_y, epochs=1)
 
 # model = BiLSTM_Model()
@@ -57,7 +59,7 @@ model.save('./models/full_model')
 # model = load_model('./models/full_model')
 
 # model.tf_model.load_weights('./checkpoints/saved-model-01-0.96.hdf5')
-# test_x = test_x[]
+# test_x = test_x[8100:]
 pred = model.predict(test_x)
 print(len(pred))
 print(len(test_x))
@@ -85,6 +87,5 @@ for i in range(len(test_x)):
 #         if y[i]!='O':
 #             print(x[i])
 
-    
 with open("./output/bert.arr", "wb") as fp:   #Pickling
     pickle.dump(pred, fp)

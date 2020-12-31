@@ -1,9 +1,10 @@
 import pickle
 from output_generator import OutputGenerator
 from data_processor import DataProcessor
+from file_processor import FileProcessor
 
 def data4bert():
-    f = open("./test_data/test.data", encoding='utf-8')
+    f = open("./test_data/final_last.data", encoding='utf-8')
     x=[]
     y=[]
     tmp_x=[]
@@ -114,7 +115,7 @@ def handle_bert_output():
     return res
 
 def format_data():
-    f = open("./test_data/final.txt", encoding='utf-8')
+    f = open("./test_data/final_last.txt", encoding='utf-8')
     lines = []
     line = f.readline()
     line = f.readline()
@@ -127,7 +128,7 @@ def format_data():
         line = f.readline()
     print(len(lines))
     f.close()
-    f = open("test_data/final_fmt.txt",  "a", encoding='utf-8')
+    f = open("test_data/final_fmt_last.txt",  "a", encoding='utf-8')
     for line in lines:
         f.write(line)
         f.write('article_id	start_position	end_position	entity_text	entity_type\n')
@@ -172,9 +173,12 @@ def check_words():
 def gen_output():
     test_data_path = './test_data/final_fmt.data'
 
-test_data_path = './test_data/test_simp.data'
+# file_processor = FileProcessor()
+# file_processor.process_file('test_data/final_fmt_last.txt', 'test_data/final_last.data')
+# data4bert()
+test_data_path = './test_data/final_last.data'
 pred = handle_bert_output()
-# data_processor = DataProcessor()
-# testdata_list, test_data_article_id_list = data_processor.generate_dataset(test_data_path)
-# output = OutputGenerator()
-# output.generate(pred, testdata_list, test_data_article_id_list, 'output.tsv')
+data_processor = DataProcessor()
+testdata_list, test_data_article_id_list = data_processor.generate_dataset(test_data_path)
+output = OutputGenerator()
+output.generate(pred, testdata_list, test_data_article_id_list, 'output.tsv')
